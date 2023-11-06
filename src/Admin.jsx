@@ -22,8 +22,6 @@ const Admin = () => {
     const toast = useToast();
     const [searchQuery, setSearchQuery] = useState('');
     const [users, setUsers] = useState([]);
-    const [block, setBlock] = useState({});
-    const [removeUser, setRemoveUser] = useState({});
 
     const authData = useStore((state) => state.authData);
     const url = import.meta.env.VITE_SERVER_URL;
@@ -48,14 +46,20 @@ const Admin = () => {
 
     const blockUser = async (id, data) => {
         if (id) {
-            setBlock({ id, data });
-            axios.put(`${url}/users/${id}`, { "isBlock": `${data}` })
+            const updatedUsers = users.map((user) =>
+                user._id === id ? { ...user, isBlock: data } : user
+            );
+
+            setUsers(updatedUsers);
+
+            axios
+                .put(`${url}/users/${id}`, { isBlock: `${data}` })
                 .then((response) => {
                     if (response.status === 200) {
                         toast({
                             position: 'top-right',
                             title: data === true ? 'Blocked.' : 'Unblocked',
-                            description: "User blocked from Subscription",
+                            description: 'User blocked from Subscription',
                             status: 'success',
                             duration: 4000,
                             isClosable: true,
@@ -65,26 +69,30 @@ const Admin = () => {
                 .catch((error) => {
                     toast({
                         position: 'top-right',
-                        description: "Failed to block.",
+                        description: 'Failed to block.',
                         status: 'error',
                         duration: 4000,
                         isClosable: true,
                     });
-                    console.log("Error:", error);
+                    console.log('Error:', error);
                 });
         }
     };
 
     const deleteUser = async (id) => {
         if (id) {
-            setRemoveUser({ id });
-            axios.delete(`${url}/users/${id}`)
+            const updatedUsers = users.filter((user) => user._id !== id);
+
+            setUsers(updatedUsers);
+
+            axios
+                .delete(`${url}/users/${id}`)
                 .then((response) => {
                     if (response.status === 200) {
                         toast({
                             position: 'top-right',
                             title: 'Deleted.',
-                            description: "User Deleted.",
+                            description: 'User Deleted.',
                             status: 'success',
                             duration: 4000,
                             isClosable: true,
@@ -94,19 +102,20 @@ const Admin = () => {
                 .catch((error) => {
                     toast({
                         position: 'top-right',
-                        description: "Failed to Delete.",
+                        description: 'Failed to Delete.',
                         status: 'error',
                         duration: 4000,
                         isClosable: true,
                     });
-                    console.log("Error:", error);
+                    console.log('Error:', error);
                 });
         }
     };
 
+
     useEffect(() => {
         fetchUser();
-    }, [block, removeUser]);
+    }, []);
 
     if (!authData || authData.message !== 'success') {
         return (
