@@ -13,7 +13,7 @@ import {
     Tooltip,
     useToast,
 } from "@chakra-ui/react";
-import { NotAllowedIcon, DeleteIcon } from '@chakra-ui/icons';
+import { NotAllowedIcon, DeleteIcon, BellIcon } from '@chakra-ui/icons';
 import axios from 'axios';
 import React, { useEffect, useState } from "react";
 import { useStore } from './useStore';
@@ -146,7 +146,10 @@ const Admin = () => {
                         <Tbody>
                             {users.map((user) => (
                                 <Tr key={user.createdAt}>
-                                    <Td>{user.chatId}</Td>
+                                    <Td>
+                                        {user.chatId}<span>{user.isSubscribe ? <BellIcon color='green' mx={'8px'} /> : null}</span>
+                                        {/* <Button></Button> */}
+                                    </Td>
                                     <Td>
                                         <span dangerouslySetInnerHTML={{ __html: highlightSearchTerm(user.city, searchQuery) }} />
                                     </Td>
